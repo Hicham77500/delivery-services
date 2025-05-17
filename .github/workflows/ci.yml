@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # Order service: lint, test, docker build
+      - name: Lint Order service
+        run: |
+          cd services/order
+          npm ci
+          npm run lint
+
+      - name: Test Order service
+        run: |
+          cd services/order
+          npm ci
+          npm test
+
+      - name: Build Order Docker image
+        run: |
+          docker build services/order -t order-service:${{ github.sha }}
+
+      # Gateway service: lint, test, docker build
+      - name: Lint Gateway service
+        run: |
+          cd services/gateway
+          npm ci
+          npm run lint
+
+      - name: Test Gateway service
+        run: |
+          cd services/gateway
+          npm ci
+          npm test
+
+      - name: Build Gateway Docker image
+        run: |
+          docker build services/gateway -t gateway-service:${{ github.sha }}
