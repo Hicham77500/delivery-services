@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "rootDir": ".",
+    "types": ["node", "jest"]
+  },
+  "include": ["domain/**/*.ts", "application/**/*.ts", "infra/**/*.ts", "index.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

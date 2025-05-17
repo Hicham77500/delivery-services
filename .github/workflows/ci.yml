@@ -9,6 +9,10 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [order, gateway]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -18,36 +22,20 @@ jobs:
         with:
           node-version: '16'
 
-      # Order service: lint, test, docker build
-      - name: Lint Order service
+      - name: Install dependencies
         run: |
-          cd services/order
+          cd services/${{ matrix.service }}
           npm ci
+
+      - name: Lint service ${{ matrix.service }}
+        run: |
+          cd services/${{ matrix.service }}
           npm run lint
 
-      - name: Test Order service
+      - name: Test service ${{ matrix.service }}
         run: |
-          cd services/order
-          npm ci
+          cd services/${{ matrix.service }}
           npm test
 
-      - name: Build Order Docker image
-        run: |
-          docker build services/order -t order-service:${{ github.sha }}
-
-      # Gateway service: lint, test, docker build
-      - name: Lint Gateway service
-        run: |
-          cd services/gateway
-          npm ci
-          npm run lint
-
-      - name: Test Gateway service
-        run: |
-          cd services/gateway
-          npm ci
-          npm test
-
-      - name: Build Gateway Docker image
-        run: |
-          docker build services/gateway -t gateway-service:${{ github.sha }}
+      - name: Build Docker image for ${{ matrix.service }}
+        run: docker build services/${{ matrix.service }} -t ${{ matrix.service }}-service:${{ github.sha }}
